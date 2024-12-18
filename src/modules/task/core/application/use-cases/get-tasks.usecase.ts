@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Task, TaskStatus } from '../domain/task.entity';
 import { TaskRepository } from '../ports/secondary/task.repository';
 import { GetTasksInputPort } from '../ports/primary/get-tasks.input-port';
+import { TaskStatus, Task } from '../../domain/task.entity';
 
 @Injectable()
 export class GetTasksUseCase implements GetTasksInputPort {

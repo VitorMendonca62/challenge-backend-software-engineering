@@ -1,4 +1,4 @@
-import { Task } from '../../domain/task.entity';
+import { Task } from 'modules/task/core/domain/task.entity';
 
 export interface ResponseTasksOutputPort {
   message: string;

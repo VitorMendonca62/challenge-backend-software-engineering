@@ -1,4 +1,4 @@
-import { Task, TaskStatus } from '../../domain/task.entity';
+import { Task, TaskStatus } from 'modules/task/core/domain/task.entity';
 
 export interface TaskRepository {
   create(task: Task): Promise<undefined>;

@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { CreateTaskInputPort } from '../ports/primary/create-task.input-port';
-import { Task } from '../domain/task.entity';
 import { TaskRepository } from '../ports/secondary/task.repository';
 import { randomUUID } from 'crypto';
-import { CreateTaskDTO } from '../../adaptars/primary/rest/dto';
+import { Task } from '../../domain/task.entity';
+import { CreateTaskDTO } from 'modules/task/adaptars/primary/rest/dto';
 
 @Injectable()
 export class CreateTaskUseCase implements CreateTaskInputPort {

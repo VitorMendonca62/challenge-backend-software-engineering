@@ -8,12 +8,12 @@ import {
   Delete,
 } from '@nestjs/common';
 import { CreateTaskDTO, UpdateTaskDTO } from './dto';
-import { CreateTaskInputPort } from 'src/modules/task2/core/ports/primary/create-task.input-port';
-import { GetTaskInputPort } from 'src/modules/task2/core/ports/primary/get-task.input-port';
-import { GetTasksInputPort } from 'src/modules/task2/core/ports/primary/get-tasks.input-port';
-import { DeleteTaskInputPort } from 'src/modules/task2/core/ports/primary/delete-user.input-port';
-import { UpdateTaskInputPort } from 'src/modules/task2/core/ports/primary/update-task.input-port';
-import { TaskStatus } from 'src/modules/task2/core/domain/task.entity';
+import { CreateTaskInputPort } from 'modules/task/core/application/ports/primary/create-task.input-port';
+import { DeleteTaskInputPort } from 'modules/task/core/application/ports/primary/delete-user.input-port';
+import { GetTaskInputPort } from 'modules/task/core/application/ports/primary/get-task.input-port';
+import { GetTasksInputPort } from 'modules/task/core/application/ports/primary/get-tasks.input-port';
+import { UpdateTaskInputPort } from 'modules/task/core/application/ports/primary/update-task.input-port';
+import { TaskStatus } from 'modules/task/core/domain/task.entity';
 
 @Controller('task')
 export class taskController {
