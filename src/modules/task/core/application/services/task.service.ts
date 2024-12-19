@@ -17,8 +17,10 @@ export class TaskService implements TaskServiceInboundPort {
     const createdAt = new Date();
     const updatedAt = new Date();
     const status = EnumTaskStatus.Pending;
-
+    // Criar uma Mappper para validação de dados
     const task = new Task({ ...body, id, createdAt, updatedAt, status });
+
+    // Fazer a conexão entre service e banco de dados
     this.taskRepository.create(task);
 
     return task;
