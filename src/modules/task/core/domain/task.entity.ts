@@ -1,5 +1,4 @@
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-enum EnumTaskStatus {
+export enum EnumTaskStatus {
   Pending = 'pendente',
   Doing = 'realizando',
   Completed = 'concluida',
@@ -24,5 +23,17 @@ export class Task {
     this.expiresOn = data.expiresOn;
     this.createdAt = new Date();
     this.updatedAt = new Date();
+  }
+
+  static toJson(task: Task) {
+    return {
+      id: task.id,
+      title: task.title,
+      description: task.description,
+      status: task.status,
+      expiresOn: task.expiresOn,
+      createdAt: task.createdAt,
+      updatedAt: task.updatedAt,
+    };
   }
 }
