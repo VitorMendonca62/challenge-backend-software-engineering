@@ -8,27 +8,17 @@ import {
   Delete,
 } from '@nestjs/common';
 import { CreateTaskDTO, UpdateTaskDTO } from './dto';
-import { CreateTaskInputPort } from 'modules/task/core/application/ports/primary/create-task.input-port';
-import { DeleteTaskInputPort } from 'modules/task/core/application/ports/primary/delete-user.input-port';
-import { GetTaskInputPort } from 'modules/task/core/application/ports/primary/get-task.input-port';
-import { GetTasksInputPort } from 'modules/task/core/application/ports/primary/get-tasks.input-port';
-import { UpdateTaskInputPort } from 'modules/task/core/application/ports/primary/update-task.input-port';
 import { TaskStatus } from 'modules/task/core/domain/task.entity';
+import { TaskService } from 'modules/task/core/application/services/task.service';
 
 @Controller('task')
 export class taskController {
-  constructor(
-    private createUserPort: CreateTaskInputPort,
-    private getTaskInputPort: GetTaskInputPort,
-    private getTasksInputPort: GetTasksInputPort,
-    private deleteTaskInputPort: DeleteTaskInputPort,
-    private updateTaskInputPort: UpdateTaskInputPort,
-  ) {}
+  constructor(private readonly taskService: TaskService) {}
 
   @Post()
   create(@Body() body: CreateTaskDTO) {
     try {
-      return this.createUserPort.execute(body);
+      return this.taskService.create(body);
     } catch (err: any) {
       return { message: err.message, data: undefined };
     }
@@ -37,7 +27,7 @@ export class taskController {
   @Get()
   findAll() {
     try {
-      return this.getTasksInputPort.getAll();
+      return this.taskService.findAll();
     } catch (err: any) {
       return { message: err.message, data: undefined };
     }
@@ -46,7 +36,7 @@ export class taskController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     try {
-      return this.getTaskInputPort.execute(id);
+      return this.taskService.findById(id);
     } catch (err: any) {
       return { message: err.message, data: undefined };
     }
@@ -54,7 +44,7 @@ export class taskController {
 
   filterByStatus(@Param('status') status: TaskStatus) {
     try {
-      return this.getTaskInputPort.execute(status);
+      return this.taskService.findByStatus(status);
     } catch (err: any) {
       return { message: err.message, data: undefined };
     }
@@ -63,7 +53,7 @@ export class taskController {
   @Patch(':id')
   update(@Param('id') id: string, @Body() newTask: UpdateTaskDTO) {
     try {
-      return this.updateTaskInputPort.execute(id, newTask);
+      return this.taskService.update(id, newTask);
     } catch (err: any) {
       return { message: err.message, data: undefined };
     }
@@ -72,7 +62,7 @@ export class taskController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     try {
-      return this.deleteTaskInputPort.execute(id);
+      return this.taskService.delete(id);
     } catch (err: any) {
       return { message: err.message, data: undefined };
     }
