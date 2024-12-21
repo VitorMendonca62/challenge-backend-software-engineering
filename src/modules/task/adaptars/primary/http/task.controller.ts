@@ -13,22 +13,18 @@ import {
 import { CreateTaskUseCase } from 'modules/task/core/application/use-cases/create-task.usecase';
 import { DeleteTaskUseCase } from 'modules/task/core/application/use-cases/delete-task.usecase';
 import { UpdateTaskUseCase } from 'modules/task/core/application/use-cases/update-task.usecase';
-import {
-  EnumTaskStatus,
-  TaskStatus,
-} from 'modules/task/core/domain/task.entity';
+import { TaskStatus } from 'modules/task/core/domain/task.entity';
 import { CreateTaskDTO, ResponseCreateTask } from './dto/create-task.dto';
 import { UpdateTaskDTO } from './dto/update-task.dto';
 import { GetTaskUseCase } from 'modules/task/core/application/use-cases/get-task.usecase';
 import { GetTasksUseCase } from 'modules/task/core/application/use-cases/get-tasks.usecase';
 import { TaskMapper } from '../../mapper/task.mapper';
-import {
-  ApiOperation,
-  ApiParam,
-  ApiQuery,
-  ApiResponse,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiTags } from '@nestjs/swagger';
+import { PostTaskSwagger } from './decorators/post-task-swagger.decorator';
+import { GetTasksSwagger } from './decorators/get-tasks-swagger.decorator';
+import { GetTaskSwagger } from './decorators/get-task-swagger.decorator';
+import { UpdateTaskSwagger } from './decorators/update-task-swagger.decorator';
+import { DeleteTaskSwagger } from './decorators/delete-task-swagger.decorator';
 
 @ApiTags('task')
 @Controller('task')
@@ -43,12 +39,7 @@ export class TaskController {
     private readonly deleteTaskUseCase: DeleteTaskUseCase,
   ) {}
 
-  @ApiOperation({
-    summary: 'Criar uma tarefa no banco de dados',
-    parameters: null,
-  })
-  @ApiResponse({ status: 201, description: 'Tarefa criada com sucesso' })
-  @ApiResponse({ status: 400, description: 'Dados inválidos' })
+  @PostTaskSwagger()
   @Post()
   async create(
     @Body() createTaskDTO: CreateTaskDTO,
@@ -68,18 +59,7 @@ export class TaskController {
     };
   }
 
-  @ApiOperation({
-    summary: 'Listar todas as tarefas no banco de dados',
-  })
-  @ApiQuery({
-    name: 'status',
-    required: false,
-    description: 'A  tarefa é encontrada pelo status',
-    enum: EnumTaskStatus,
-  })
-  @ApiResponse({ status: 200, description: 'Listagem de todas as tarefas' })
-  @ApiResponse({ status: 400, description: 'Dados inválidos' })
-  @ApiResponse({ status: 404, description: 'Não encontrou tarefas' })
+  @GetTasksSwagger()
   @Get()
   async findAll(@Query('status') status: TaskStatus | null) {
     if (status) {
@@ -93,37 +73,13 @@ export class TaskController {
     };
   }
 
-  @ApiOperation({
-    summary: 'Listar apenas uma tarefa pelo id',
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'Aqui está sua tarera encontrada pelo ID',
-  })
-  @ApiParam({
-    name: 'id',
-    required: true,
-    description: 'Encontrar tarefa pelo ID',
-    example: '72cfef2f-03ba-402e-93f7-71a74bf1fa08',
-  })
-  @ApiResponse({ status: 404, description: 'Não encontrou a tarefa pelo ID' })
+  @GetTaskSwagger()
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.getTaskUseCase.findById(id);
   }
 
-  @ApiOperation({
-    summary: 'Atualizar alguns campos de uma tarefa pelo ID',
-  })
-  @ApiParam({
-    name: 'id',
-    required: true,
-    description: 'A tarefa é encontrada pelo ID',
-    example: '72cfef2f-03ba-402e-93f7-71a74bf1fa08',
-  })
-  @ApiResponse({ status: 200, description: 'Tarefa atualizada com sucesso' })
-  @ApiResponse({ status: 400, description: 'Dados inválidos' })
-  @ApiResponse({ status: 404, description: 'Não encontrou a tarefa pelo ID' })
+  @UpdateTaskSwagger()
   @Patch(':id')
   async update(@Param('id') id: string, @Body() updateTaskDTO: UpdateTaskDTO) {
     const { title, description, expiresOn, status } = updateTaskDTO;
@@ -137,18 +93,7 @@ export class TaskController {
 
     return this.updateTaskUseCase.execute(id, newTask);
   }
-
-  @ApiOperation({
-    summary: 'Delete uma tarefa pelo ID',
-  })
-  @ApiParam({
-    name: 'id',
-    required: true,
-    description: 'A tarefa é encontrada pelo ID',
-    example: '72cfef2f-03ba-402e-93f7-71a74bf1fa08',
-  })
-  @ApiResponse({ status: 200, description: 'Tarefa deletada com sucesso' })
-  @ApiResponse({ status: 404, description: 'Não encontrou a tarefa pelo ID' })
+  @DeleteTaskSwagger()
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.deleteTaskUseCase.execute(id);
