@@ -1,0 +1,64 @@
+import { CreateTaskDTO } from '../primary/http/dto/create-task.dto';
+import { isEnum } from 'class-validator';
+import { UpdateTaskDTO } from '../primary/http/dto/update-task.dto';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import {
+  EnumTaskStatus,
+  Task,
+  TaskStatus,
+} from 'modules/task/core/domain/task.entity';
+import { randomUUID } from 'crypto';
+import { TaskRepository } from 'modules/task/core/application/ports/secondary/task-repository.interface';
+
+@Injectable()
+export class TaskMapper {
+  constructor(private taskRepository: TaskRepository) {}
+
+  async findByStatus(status: TaskStatus): Promise<void> {
+    if (!isEnum(status, EnumTaskStatus)) {
+      throw new BadRequestException(
+        'O status está inválido, escolha outro válido',
+      );
+    }
+  }
+
+  async create(createTaskDTO: CreateTaskDTO): Promise<Task> {
+    const id = randomUUID();
+    const createdAt = new Date();
+    const updatedAt = new Date();
+
+    const task = new Task({
+      ...createTaskDTO,
+      id,
+      createdAt,
+      updatedAt,
+    });
+
+    return task;
+  }
+
+  async update(id: string, updateTaskDTO: UpdateTaskDTO): Promise<Task> {
+    const oldTask = await this.taskRepository.findById(id);
+
+    if (oldTask === undefined) {
+      throw new NotFoundException('Não foi possivel encontrar a tarefa');
+    }
+
+    const { createdAt, title } = await oldTask;
+    const updatedAt = new Date();
+
+    const task = new Task({
+      title,
+      ...updateTaskDTO,
+      updatedAt,
+      id,
+      createdAt,
+    });
+
+    return task;
+  }
+}
