@@ -4,7 +4,17 @@ import { Task, TaskStatus } from 'modules/task/core/domain/task.entity';
 
 @Injectable()
 export class InMemoryTaskRepository implements TaskRepository {
-  private tasks: Task[] = [];
+  private tasks: Task[] = [
+    {
+      id: '72cfef2f-03ba-402e-93f7-71a74bf1fa08',
+      title: 'Esse é um exemplo de tarefa',
+      description: 'Não sei o que colocar aqui',
+      status: 'concluída',
+      expiresOn: new Date('2024-12-21T15:30:00+03:00'),
+      createdAt: new Date('2024-12-21T14:10:34.749Z'),
+      updatedAt: new Date('2024-12-21T14:10:34.749Z'),
+    },
+  ];
 
   async create(task: Task): Promise<Task> {
     this.tasks.push(task);
@@ -31,8 +41,8 @@ export class InMemoryTaskRepository implements TaskRepository {
     const oldTask: Task | undefined = this.tasks.find((task) => task.id == id);
     const oldTaskIndex = this.tasks.indexOf(oldTask);
 
-    this.tasks[oldTaskIndex] = { ...oldTask, ...newTask };
-    return this.tasks[oldTaskIndex];
+    this.tasks[oldTaskIndex] = newTask;
+    return newTask;
   }
 
   async delete(id: string): Promise<void> {

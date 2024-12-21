@@ -13,6 +13,7 @@ import {
 } from 'modules/task/core/domain/task.entity';
 import { randomUUID } from 'crypto';
 import { TaskRepository } from 'modules/task/core/application/ports/secondary/task-repository.interface';
+import { TaskUpdate } from 'modules/task/core/domain/task-update.entity';
 
 @Injectable()
 export class TaskMapper {
@@ -41,22 +42,18 @@ export class TaskMapper {
     return task;
   }
 
-  async update(id: string, updateTaskDTO: UpdateTaskDTO): Promise<Task> {
+  async update(id: string, updateTaskDTO: UpdateTaskDTO): Promise<TaskUpdate> {
     const oldTask = await this.taskRepository.findById(id);
 
     if (oldTask === undefined) {
       throw new NotFoundException('Não foi possivel encontrar a tarefa');
     }
 
-    const { createdAt, title } = await oldTask;
     const updatedAt = new Date();
 
-    const task = new Task({
-      title,
+    const task = new TaskUpdate({
       ...updateTaskDTO,
       updatedAt,
-      id,
-      createdAt,
     });
 
     return task;

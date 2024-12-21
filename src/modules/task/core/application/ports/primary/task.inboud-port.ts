@@ -1,3 +1,4 @@
+import { TaskUpdate } from 'modules/task/core/domain/task-update.entity';
 import { Task, TaskStatus } from 'modules/task/core/domain/task.entity';
 
 export abstract class CreateTaskInboundPort {
@@ -14,7 +15,7 @@ export abstract class GetTasksInboundPort {
 }
 
 export abstract class UpdateTaskInboundPort {
-  abstract execute(id: string, newTask: Task): Promise<Task>;
+  abstract execute(id: string, newTask: TaskUpdate): Promise<Task>;
 }
 
 export abstract class DeleteTaskInboundPort {
