@@ -1,3 +1,26 @@
+import { Task, TaskStatus } from 'modules/task/core/domain/task.entity';
+import { CreateTaskDTO } from './dto/create-task.dto';
+import { UpdateTaskDTO } from './dto/update-task.dto';
+import { TaskMapper } from '../../mapper/task.mapper';
+import { ApiTags } from '@nestjs/swagger';
+
+// Use cases
+
+import { CreateTaskUseCase } from 'modules/task/core/application/use-cases/create-task.usecase';
+import { DeleteTaskUseCase } from 'modules/task/core/application/use-cases/delete-task.usecase';
+import { UpdateTaskUseCase } from 'modules/task/core/application/use-cases/update-task.usecase';
+import { GetTaskUseCase } from 'modules/task/core/application/use-cases/get-task.usecase';
+import { GetTasksUseCase } from 'modules/task/core/application/use-cases/get-tasks.usecase';
+
+// Decorators
+import {
+  DeleteTaskSwagger,
+  GetTaskSwagger,
+  GetTasksSwagger,
+  PostTaskSwagger,
+  UpdateTaskSwagger,
+} from './decorators/task-controller-decorators';
+
 import {
   Controller,
   Get,
@@ -10,21 +33,11 @@ import {
   ValidationPipe,
   Query,
 } from '@nestjs/common';
-import { CreateTaskUseCase } from 'modules/task/core/application/use-cases/create-task.usecase';
-import { DeleteTaskUseCase } from 'modules/task/core/application/use-cases/delete-task.usecase';
-import { UpdateTaskUseCase } from 'modules/task/core/application/use-cases/update-task.usecase';
-import { TaskStatus } from 'modules/task/core/domain/task.entity';
-import { CreateTaskDTO, ResponseCreateTask } from './dto/create-task.dto';
-import { UpdateTaskDTO } from './dto/update-task.dto';
-import { GetTaskUseCase } from 'modules/task/core/application/use-cases/get-task.usecase';
-import { GetTasksUseCase } from 'modules/task/core/application/use-cases/get-tasks.usecase';
-import { TaskMapper } from '../../mapper/task.mapper';
-import { ApiTags } from '@nestjs/swagger';
-import { PostTaskSwagger } from './decorators/post-task-swagger.decorator';
-import { GetTasksSwagger } from './decorators/get-tasks-swagger.decorator';
-import { GetTaskSwagger } from './decorators/get-task-swagger.decorator';
-import { UpdateTaskSwagger } from './decorators/update-task-swagger.decorator';
-import { DeleteTaskSwagger } from './decorators/delete-task-swagger.decorator';
+
+abstract class ResponseController {
+  abstract message: string;
+  abstract data: Task | undefined;
+}
 
 @ApiTags('task')
 @Controller('task')
@@ -43,7 +56,7 @@ export class TaskController {
   @Post()
   async create(
     @Body() createTaskDTO: CreateTaskDTO,
-  ): Promise<ResponseCreateTask> {
+  ): Promise<ResponseController> {
     const { title, description, expiresOn, status } = createTaskDTO;
 
     const task = await this.taskMapper.create({

@@ -1,7 +1,7 @@
-import { Task, TaskStatus } from 'modules/task/core/domain/task.entity';
+import { TaskStatus } from 'modules/task/core/domain/task.entity';
 import { Title } from '../decorators/title.decorator';
 import { Description } from '../decorators/description.decorator';
-import { ExpiresOn } from '../decorators/expiresOn.decorator';
+import { ExpiresOn } from '../decorators/expires-on.decorator';
 import { Status } from '../decorators/status.decorator';
 
 export class CreateTaskDTO {
@@ -16,9 +16,4 @@ export class CreateTaskDTO {
 
   @Status(true)
   status: TaskStatus;
-}
-
-export class ResponseCreateTask {
-  message: string;
-  data: Task;
 }
