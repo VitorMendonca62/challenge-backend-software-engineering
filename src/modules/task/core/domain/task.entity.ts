@@ -7,7 +7,7 @@ export enum EnumTaskStatus {
 export type TaskStatus = 'pendente' | 'realizando' | 'concluída';
 
 export class Task {
-  id: string;
+  id?: string;
   title: string;
   description?: string;
   status: TaskStatus;

@@ -10,12 +10,14 @@ export class TaskUpdate {
   title?: string;
   description?: string;
   status?: TaskStatus;
+  expiresOn: Date;
   updatedAt: Date;
 
   constructor(data: TaskUpdate) {
     if (data.title) this.title = data.title;
     if (data.description) this.description = data.description;
     if (data.status) this.status = data.status;
+    if (data.expiresOn) this.expiresOn = data.expiresOn;
     if (data.updatedAt) this.updatedAt = data.updatedAt;
   }
 
@@ -25,6 +27,7 @@ export class TaskUpdate {
       description: task.description,
       status: task.status,
       updatedAt: task.updatedAt,
+      expiresOn: task.expiresOn,
     };
   }
 }

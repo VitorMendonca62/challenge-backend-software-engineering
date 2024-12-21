@@ -8,8 +8,6 @@ export class CreateTaskUseCase implements CreateTaskInboundPort {
   constructor(private readonly taskRepository: TaskRepository) {}
 
   async execute(task: Task): Promise<Task> {
-    this.taskRepository.create(task);
-
-    return task;
+    return this.taskRepository.create(task);
   }
 }

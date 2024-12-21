@@ -11,7 +11,6 @@ import {
   Task,
   TaskStatus,
 } from 'modules/task/core/domain/task.entity';
-import { randomUUID } from 'crypto';
 import { TaskRepository } from 'modules/task/core/application/ports/secondary/task-repository.interface';
 import { TaskUpdate } from 'modules/task/core/domain/task-update.entity';
 
@@ -28,13 +27,11 @@ export class TaskMapper {
   }
 
   async create(createTaskDTO: CreateTaskDTO): Promise<Task> {
-    const id = randomUUID();
     const createdAt = new Date();
     const updatedAt = new Date();
 
     const task = new Task({
       ...createTaskDTO,
-      id,
       createdAt,
       updatedAt,
     });
@@ -50,9 +47,11 @@ export class TaskMapper {
     }
 
     const updatedAt = new Date();
+    const expiresOn = new Date(updateTaskDTO.expiresOn);
 
     const task = new TaskUpdate({
       ...updateTaskDTO,
+      expiresOn,
       updatedAt,
     });
 

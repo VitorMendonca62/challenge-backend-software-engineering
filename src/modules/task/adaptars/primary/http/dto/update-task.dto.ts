@@ -12,7 +12,7 @@ export class UpdateTaskDTO {
   description?: string;
 
   @ExpiresOn()
-  expiresOn?: Date;
+  expiresOn?: string;
 
   @Status(false)
   status: TaskStatus;

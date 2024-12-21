@@ -1,7 +1,7 @@
 import { Task, TaskStatus } from 'modules/task/core/domain/task.entity';
 import { CreateTaskDTO } from './dto/create-task.dto';
 import { UpdateTaskDTO } from './dto/update-task.dto';
-import { TaskMapper } from '../../mapper/task.mapper';
+import { TaskMapper } from '../../mappers/task.mapper';
 import { ApiTags } from '@nestjs/swagger';
 
 // Use cases
