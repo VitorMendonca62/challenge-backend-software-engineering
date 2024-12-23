@@ -1,6 +1,6 @@
 import { TaskRepository } from '../ports/secondary/task-repository.interface';
 import { UpdateTaskInboundPort } from '../ports/primary/task.inboud-port';
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Task } from '../../domain/task.entity';
 import { TaskUpdate } from '../../domain/task-update.entity';
 
@@ -10,6 +10,10 @@ export class UpdateTaskUseCase implements UpdateTaskInboundPort {
 
   async execute(id: string, taskUpdate: TaskUpdate): Promise<Task> {
     const oldTask = await this.taskRepository.findById(id);
+
+    if (oldTask === undefined) {
+      throw new NotFoundException('Não foi possivel encontrar a tarefa');
+    }
 
     const newTask = new Task({ ...oldTask, ...taskUpdate });
 
