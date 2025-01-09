@@ -1,12 +1,14 @@
 import { Injectable } from '@nestjs/common';
-import { TaskRepository } from 'modules/task/core/application/ports/secondary/task-repository.interface';
-import { Task, TaskStatus } from 'modules/task/core/domain/task.entity';
+import { TaskRepository } from '@modules/task/core/application/ports/secondary/task-repository.interface';
+import { Task, TaskStatus } from '@modules/task/core/domain/task.entity';
+import { v4 } from 'uuid';
+import { TaskUpdate } from '@modules/task/core/domain/task-update.entity';
 
 @Injectable()
 export class InMemoryTaskRepository implements TaskRepository {
   private tasks: Task[] = [
     {
-      id: '72cfef2f-03ba-402e-93f7-71a74bf1fa08',
+      _id: v4(),
       title: 'Esse é um exemplo de tarefa',
       description: 'Não sei o que colocar aqui',
       status: 'concluída',
@@ -17,12 +19,13 @@ export class InMemoryTaskRepository implements TaskRepository {
   ];
 
   async create(task: Task): Promise<Task> {
+    task._id = v4();
     this.tasks.push(task);
     return task;
   }
 
   async findById(id: string): Promise<Task | undefined> {
-    const task: Task | undefined = this.tasks.find((task) => task.id == id);
+    const task: Task | undefined = this.tasks.find((task) => task._id == id);
 
     return task;
   }
@@ -37,16 +40,16 @@ export class InMemoryTaskRepository implements TaskRepository {
     return tasks;
   }
 
-  async update(id: string, newTask: Task): Promise<Task> {
-    const oldTask: Task | undefined = this.tasks.find((task) => task.id == id);
+  async update(id: string, newTask: TaskUpdate): Promise<Task> {
+    const oldTask: Task | undefined = this.tasks.find((task) => task._id == id);
     const oldTaskIndex = this.tasks.indexOf(oldTask);
 
-    this.tasks[oldTaskIndex] = newTask;
-    return newTask;
+    this.tasks[oldTaskIndex] = { ...this.tasks[oldTaskIndex], ...newTask };
+    return this.tasks[oldTaskIndex];
   }
 
   async delete(id: string): Promise<void> {
-    const index = this.tasks.findIndex((book) => book.id === id);
+    const index = this.tasks.findIndex((book) => book._id === id);
 
     if (index !== -1) {
       this.tasks.splice(index, 1);

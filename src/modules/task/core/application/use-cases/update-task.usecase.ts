@@ -15,8 +15,6 @@ export class UpdateTaskUseCase implements UpdateTaskInboundPort {
       throw new NotFoundException('Não foi possivel encontrar a tarefa');
     }
 
-    const newTask = new Task({ ...oldTask, ...taskUpdate });
-
-    return await this.taskRepository.update(id, newTask);
+    return await this.taskRepository.update(id, taskUpdate);
   }
 }

@@ -14,7 +14,9 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, documentFactory);
 
   await app.listen(process.env.PORT ?? 3000);
-  console.log(`Database hosting in ${process.env.DATABASE_URL}`);
+  if (process.env.REPOSITORY == 'MONGOOSE') {
+    console.log(`Database hosting in ${process.env.DATABASE_URL}`);
+  }
   console.log(
     `Server listing on url ${process.env.HOST}:${process.env.PORT ?? 3000}`,
   );

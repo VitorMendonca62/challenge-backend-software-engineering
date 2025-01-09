@@ -6,8 +6,8 @@ import {
   EnumTaskStatus,
   Task,
   TaskStatus,
-} from 'modules/task/core/domain/task.entity';
-import { TaskUpdate } from 'modules/task/core/domain/task-update.entity';
+} from '@modules/task/core/domain/task.entity';
+import { TaskUpdate } from '@modules/task/core/domain/task-update.entity';
 
 @Injectable()
 export class TaskMapper {

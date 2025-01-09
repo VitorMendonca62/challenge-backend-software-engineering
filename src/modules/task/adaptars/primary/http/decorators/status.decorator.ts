@@ -1,7 +1,7 @@
+import { EnumTaskStatus } from '@modules/task/core/domain/task.entity';
 import { applyDecorators } from '@nestjs/common';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsNotEmpty, IsOptional } from 'class-validator';
-import { EnumTaskStatus } from 'modules/task/core/domain/task.entity';
 
 export function Status(required: boolean) {
   const decoratorRequired = required

@@ -1,4 +1,4 @@
-import { EnumTaskStatus } from 'modules/task/core/domain/task.entity';
+import { EnumTaskStatus } from '@modules/task/core/domain/task.entity';
 import { applyDecorators } from '@nestjs/common';
 import { ApiOperation, ApiQuery, ApiResponse } from '@nestjs/swagger';
 

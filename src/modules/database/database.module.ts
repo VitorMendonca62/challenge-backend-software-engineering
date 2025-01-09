@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { databaseProviders } from './database.providers';
+import { MongooseService } from './mongoose.service';
 
-@Module({ providers: [...databaseProviders], exports: [...databaseProviders] })
+@Module({ providers: [MongooseService] })
 export class DatabaseModule {}

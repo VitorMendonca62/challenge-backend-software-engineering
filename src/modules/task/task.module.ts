@@ -7,9 +7,8 @@ import { CreateTaskUseCase } from './core/application/use-cases/create-task.usec
 import { DeleteTaskUseCase } from './core/application/use-cases/delete-task.usecase';
 import { TaskRepository } from './core/application/ports/secondary/task-repository.interface';
 import { TaskMapper } from './adaptars/mappers/task.mapper';
-import { TaskSchema } from './adaptars/secondary/database/schemas/task.schema';
-import { Connection } from 'mongoose';
-import { DatabaseModule } from 'modules/database/database.module';
+import { DatabaseModule } from '@modules/database/database.module';
+// import { InMemoryTaskRepository } from './adaptars/secondary/database/repositories/in-memory-task-repository';
 import { MongooseTaskRepository } from './adaptars/secondary/database/repositories/mongoose-taks-repository';
 
 @Module({
@@ -25,12 +24,6 @@ import { MongooseTaskRepository } from './adaptars/secondary/database/repositori
     {
       provide: TaskRepository,
       useClass: MongooseTaskRepository,
-    },
-    {
-      provide: 'TASK_MODEL',
-      useFactory: (connection: Connection) =>
-        connection.model('Task', TaskSchema),
-      inject: ['DATABASE_CONNECTION'],
     },
   ],
 })

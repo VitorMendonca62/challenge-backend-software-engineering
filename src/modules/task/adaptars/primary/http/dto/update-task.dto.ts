@@ -15,5 +15,5 @@ export class UpdateTaskDTO {
   expiresOn?: string;
 
   @Status(false)
-  status: TaskStatus;
+  status?: TaskStatus;
 }

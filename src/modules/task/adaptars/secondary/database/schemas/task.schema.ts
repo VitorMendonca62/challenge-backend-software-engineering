@@ -8,7 +8,7 @@ export const TaskSchema = new mongoose.Schema({
   description: { type: String, required: false },
   status: {
     type: String,
-    enum: ['pendente', 'realizando', 'concluida'],
+    enum: ['pendente', 'realizando', 'concluída'],
     required: true,
   },
   expiresOn: { type: Date, required: false },

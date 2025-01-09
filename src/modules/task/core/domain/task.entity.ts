@@ -1,13 +1,15 @@
+import { Types } from 'mongoose';
+
 export enum EnumTaskStatus {
   Pending = 'pendente',
   Doing = 'realizando',
-  Completed = 'concluida',
+  Completed = 'concluída',
 }
 
 export type TaskStatus = 'pendente' | 'realizando' | 'concluída';
 
 export class Task {
-  id?: string;
+  _id?: Types.ObjectId | string;
   title: string;
   description?: string;
   status: TaskStatus;
@@ -16,7 +18,6 @@ export class Task {
   updatedAt: Date;
 
   constructor(data: Task) {
-    this.id = data.id;
     this.title = data.title;
     this.description = data.description;
     this.status = data.status;
@@ -27,7 +28,6 @@ export class Task {
 
   static toJson(task: Task) {
     return {
-      id: task.id,
       title: task.title,
       description: task.description,
       status: task.status,

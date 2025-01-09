@@ -1,17 +1,22 @@
-import { Inject } from '@nestjs/common';
-import { TaskRepository } from 'modules/task/core/application/ports/secondary/task-repository.interface';
-import { Task, TaskStatus } from 'modules/task/core/domain/task.entity';
+import { MongooseService } from '@modules/database/mongoose.service';
+import { TaskRepository } from '@modules/task/core/application/ports/secondary/task-repository.interface';
+import { TaskUpdate } from '@modules/task/core/domain/task-update.entity';
+import { Task, TaskStatus } from '@modules/task/core/domain/task.entity';
+import { ConfigService } from '@nestjs/config';
 import { Model } from 'mongoose';
 
 export class MongooseTaskRepository implements TaskRepository {
-  constructor(
-    @Inject('TASK_MODEL')
-    private taskModel: Model<Task>,
-  ) {}
+  taskModel: Model<Task>;
+
+  constructor() {
+    const databaseService = new MongooseService(new ConfigService());
+    databaseService.getModel().then((model) => {
+      this.taskModel = model;
+    });
+  }
 
   create(task: Task): Promise<Task> {
-    const createdTask = new this.taskModel(task);
-    return createdTask.save();
+    return new this.taskModel(task).save();
   }
 
   findById(id: string): Promise<Task> {
@@ -23,12 +28,15 @@ export class MongooseTaskRepository implements TaskRepository {
   findByStatus(status: TaskStatus): Promise<Task[]> {
     return this.taskModel.find({ status }).exec();
   }
-  update(id: string, newTask: Task): Promise<Task> {
+
+  async update(id: string, newTask: TaskUpdate): Promise<Task> {
     return this.taskModel
-      .findOneAndUpdate({ id }, { ...newTask }, { new: true })
+      .findOneAndUpdate({ _id: id }, newTask, {
+        new: true,
+      })
       .exec();
   }
   async delete(id: string): Promise<void> {
-    this.taskModel.findOneAndDelete({ id }, { new: true }).exec();
+    this.taskModel.findOneAndDelete({ _id: id }, { new: true }).exec();
   }
 }

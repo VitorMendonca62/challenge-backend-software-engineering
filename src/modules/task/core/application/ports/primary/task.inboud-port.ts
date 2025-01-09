@@ -1,5 +1,5 @@
-import { TaskUpdate } from 'modules/task/core/domain/task-update.entity';
-import { Task, TaskStatus } from 'modules/task/core/domain/task.entity';
+import { TaskUpdate } from '@modules/task/core/domain/task-update.entity';
+import { Task, TaskStatus } from '@modules/task/core/domain/task.entity';
 
 export abstract class CreateTaskInboundPort {
   abstract execute(task: Task): Promise<Task>;
