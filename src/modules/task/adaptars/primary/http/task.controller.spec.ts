@@ -252,5 +252,17 @@ describe('TaskController', () => {
         'Não foi possivel encontrar tarefas nesse filtro',
       );
     });
+
+    it('should throw bad request error with invalid status', async () => {
+      const response = await request(app.getHttpServer())
+        .get('/task?status=invalid-status')
+        .expect(400);
+
+      expect(response.body).toEqual({
+        message: 'O status está inválido, escolha outro válido',
+        error: 'Bad Request',
+        statusCode: 400,
+      });
+    });
   });
 });
