@@ -35,6 +35,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { TaskUpdate } from '@modules/task/core/domain/task-update.entity';
+import { ValidationStatusPipe } from './pipes/validate-status.pipe';
 
 abstract class ResponseController {
   abstract message: string;
@@ -76,6 +77,7 @@ export class TaskController {
 
   @GetTasksSwagger()
   @Get()
+  @UsePipes(new ValidationStatusPipe())
   async findAll(@Query('status') status?: TaskStatus) {
     if (status) {
       return {
