@@ -120,7 +120,10 @@ export class TaskController {
       );
     }
 
-    return this.updateTaskUseCase.execute(id, newTask);
+    return {
+      data: this.updateTaskUseCase.execute(id, newTask),
+      message: 'Tarefa atualizada com sucesso!',
+    };
   }
   @DeleteTaskSwagger()
   @Delete(':id')
