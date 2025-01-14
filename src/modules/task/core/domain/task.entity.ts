@@ -18,12 +18,12 @@ export class Task {
   updatedAt: Date;
 
   constructor(data: Task) {
-    this.title = data.title;
-    this.description = data.description;
-    this.status = data.status;
-    this.expiresOn = data.expiresOn;
-    this.createdAt = new Date();
-    this.updatedAt = new Date();
+    if (data.title) this.title = data.title;
+    if (data.description) this.description = data.description;
+    if (data.status) this.status = data.status;
+    if (data.expiresOn) this.expiresOn = data.expiresOn;
+    if (data.createdAt) this.createdAt = data.createdAt;
+    if (data.updatedAt) this.updatedAt = data.updatedAt;
   }
 
   static toJson(task: Task) {

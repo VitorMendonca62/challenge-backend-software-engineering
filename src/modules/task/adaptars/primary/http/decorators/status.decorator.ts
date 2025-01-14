@@ -14,9 +14,9 @@ export function Status(required: boolean) {
       example: EnumTaskStatus,
       required: required,
     }),
+    decoratorRequired,
     IsEnum(EnumTaskStatus, {
       message: 'O status está inválido, escolha outro válido',
     }),
-    decoratorRequired,
   );
 }

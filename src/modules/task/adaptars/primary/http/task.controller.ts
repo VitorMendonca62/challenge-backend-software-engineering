@@ -43,7 +43,7 @@ abstract class ResponseController {
 
 @ApiTags('task')
 @Controller('task')
-@UsePipes(new ValidationPipe())
+@UsePipes(new ValidationPipe({ stopAtFirstError: true }))
 export class TaskController {
   constructor(
     private readonly taskMapper: TaskMapper,
@@ -76,10 +76,13 @@ export class TaskController {
 
   @GetTasksSwagger()
   @Get()
-  async findAll(@Query('status') status: TaskStatus | null) {
+  async findAll(@Query('status') status?: TaskStatus) {
     if (status) {
-      await this.taskMapper.findByStatus(status);
-      return this.getTasksUseCase.findByStatus(status);
+      return {
+        data: await this.getTasksUseCase.findByStatus(status),
+        message:
+          'Aqui está a listagem de todas as tarefas filtradas por status',
+      };
     }
 
     return {
