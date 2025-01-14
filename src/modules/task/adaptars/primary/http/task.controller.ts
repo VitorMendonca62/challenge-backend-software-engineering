@@ -95,8 +95,11 @@ export class TaskController {
 
   @GetTaskSwagger()
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.getTaskUseCase.findById(id);
+  async findOne(@Param('id') id: string) {
+    return {
+      data: await this.getTaskUseCase.findById(id),
+      message: 'Aqui está a tarefa filtrada pelo ID',
+    };
   }
 
   @UpdateTaskSwagger()
