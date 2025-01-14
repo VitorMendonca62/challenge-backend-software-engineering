@@ -12,6 +12,7 @@ import { DatabaseModule } from '@modules/database/database.module';
 import { MongooseTaskRepository } from './adaptars/secondary/database/repositories/mongoose-taks-repository';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { InMemoryTaskRepository } from './adaptars/secondary/database/repositories/in-memory-task-repository';
+import { getRepositoryForEnvironment } from './adaptars/secondary/database/utils/repository.util';
 
 @Module({
   imports: [DatabaseModule],
@@ -25,7 +26,7 @@ import { InMemoryTaskRepository } from './adaptars/secondary/database/repositori
     TaskMapper,
     {
       provide: TaskRepository,
-      useClass: MongooseTaskRepository,
+      useFactory: getRepositoryForEnvironment,
     },
   ],
 })
