@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { TaskController } from './task.controller';
 import { CreateTaskUseCase } from '@modules/task/core/application/use-cases/create-task.usecase';
 import { DeleteTaskUseCase } from '@modules/task/core/application/use-cases/delete-task.usecase';
@@ -9,7 +8,6 @@ import { TaskMapper } from '../../mappers/task.mapper';
 import { Task, TaskStatus } from '@modules/task/core/domain/task.entity';
 import { Test, TestingModule } from '@nestjs/testing';
 import { TaskRepository } from '@modules/task/core/application/ports/secondary/task-repository.interface';
-import { InMemoryTaskRepository } from '../../secondary/database/repositories/in-memory-task-repository';
 import { CreateTaskDTO } from './dto/create-task.dto';
 import {
   INestApplication,
@@ -17,6 +15,7 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import * as request from 'supertest';
+import { getRepositoryForEnvironment } from '../../secondary/database/utils/repository.util';
 
 describe('TaskController', () => {
   let app: INestApplication;
@@ -26,7 +25,9 @@ describe('TaskController', () => {
   let createTaskUseCase: CreateTaskUseCase;
   let getTaskUseCase: GetTaskUseCase;
   let getTasksUseCase: GetTasksUseCase;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   let updateTaskUseCase: UpdateTaskUseCase;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   let deleteTaskUseCase: DeleteTaskUseCase;
 
   let taskMapper: TaskMapper;
@@ -43,7 +44,7 @@ describe('TaskController', () => {
         TaskMapper,
         {
           provide: TaskRepository,
-          useClass: InMemoryTaskRepository,
+          useFactory: () => getRepositoryForEnvironment(true),
         },
       ],
     }).compile();
@@ -263,6 +264,51 @@ describe('TaskController', () => {
         error: 'Bad Request',
         statusCode: 400,
       });
+    });
+  });
+
+  describe('GET /:id', () => {
+    beforeEach(() => {
+      const task = mockTask({
+        title: 'Task 01',
+        _id: 'IDTASK',
+      });
+
+      jest
+        .spyOn(getTaskUseCase, 'findById')
+        .mockImplementation(async () => task);
+    });
+
+    it('should use case call', async () => {
+      await taskController.findOne('IDTASK');
+
+      expect(getTaskUseCase.findById).toHaveBeenCalled();
+    });
+
+    it('should return filtered task', async () => {
+      const response = await taskController.findOne('IDTASK');
+
+      const task = mockTask({
+        title: 'Task 01',
+        _id: 'IDTASK',
+      });
+
+      expect(response).toEqual({
+        data: task,
+        message: 'Aqui está a tarefa filtrada pelo ID',
+      });
+    });
+
+    it('should throw not found error', async () => {
+      jest
+        .spyOn(getTaskUseCase, 'findById')
+        .mockRejectedValue(
+          new NotFoundException('Não foi possivel encontrar a tarefa'),
+        );
+
+      await expect(taskController.findOne('NOTFOUNDID')).rejects.toThrow(
+        'Não foi possivel encontrar a tarefa',
+      );
     });
   });
 });
