@@ -1,5 +1,5 @@
-import { InMemoryTaskRepository } from '../repositories/in-memory-task-repository';
-import { MongooseTaskRepository } from '../repositories/mongoose-taks-repository';
+import { InMemoryTaskRepository } from '../secondary/database/repositories/in-memory-task-repository';
+import { MongooseTaskRepository } from '../secondary/database/repositories/mongoose-taks-repository';
 
 export function getRepositoryForEnvironment(isTest?: boolean) {
   const repositoryType =

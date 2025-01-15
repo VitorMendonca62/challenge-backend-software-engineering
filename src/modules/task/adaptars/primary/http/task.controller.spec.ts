@@ -8,13 +8,17 @@ import { TaskMapper } from '../../mappers/task.mapper';
 import { Task, TaskStatus } from '@modules/task/core/domain/task.entity';
 import { Test, TestingModule } from '@nestjs/testing';
 import { TaskRepository } from '@modules/task/core/application/ports/secondary/task-repository.interface';
-import { CreateTaskDTO } from './dto/create-task.dto';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import * as request from 'supertest';
-import { getRepositoryForEnvironment } from '../../secondary/database/utils/repository.util';
+import { getRepositoryForEnvironment } from '../../utils/repository.util';
 import { ConfigModule } from '@nestjs/config';
 import { TaskUpdate } from '@modules/task/core/domain/task-update.entity';
-import { UpdateTaskDTO } from './dto/update-task.dto';
+import {
+  mockTask,
+  mockCreateTask,
+  mockListTask,
+  mockUpdateTask,
+} from '../../../utils/test-helpers.util';
 
 describe('TaskController', () => {
   let app: INestApplication;
@@ -44,7 +48,6 @@ describe('TaskController', () => {
         CreateTaskUseCase,
         DeleteTaskUseCase,
         TaskMapper,
-
         {
           provide: TaskRepository,
           useFactory: () => getRepositoryForEnvironment(true),
@@ -67,43 +70,19 @@ describe('TaskController', () => {
     taskMapper = module.get<TaskMapper>(TaskMapper);
   });
 
+  it('All be defined', () => {
+    expect(taskController).toBeDefined();
+    expect(getTaskUseCase).toBeDefined();
+    expect(getTasksUseCase).toBeDefined();
+    expect(updateTaskUseCase).toBeDefined();
+    expect(deleteTaskUseCase).toBeDefined();
+    expect(createTaskUseCase).toBeDefined();
+    expect(taskMapper).toBeDefined();
+  });
+
   afterEach(() => {
     app.close();
   });
-
-  const mockCreateTask = (overrides = {}): CreateTaskDTO => ({
-    title: 'Default Title',
-    status: 'pendente' as TaskStatus,
-    ...overrides,
-  });
-
-  const mockListTask = () => {
-    const task01 = mockTask({ title: 'Task01' });
-    const task02 = mockTask({ title: 'Task02', status: 'concluída' });
-    const task03 = mockTask({ title: 'Task03', status: 'realizando' });
-    const task04 = mockTask({ title: 'Task04' });
-
-    return [task01, task02, task03, task04];
-  };
-
-  const mockTask = (overrides: CreateTaskDTO | object = {}) =>
-    new Task({
-      ...mockCreateTask(overrides),
-      createdAt: new Date('Tue Jan 14 2025 11:38:38'),
-      updatedAt: new Date('Tue Jan 14 2025 11:38:38'),
-    });
-
-  const mockUpdateTask = (overrides: UpdateTaskDTO | object = {}) => {
-    if ((overrides as UpdateTaskDTO).expiresOn)
-      (overrides as UpdateTaskDTO).expiresOn = new Date(
-        (overrides as UpdateTaskDTO).expiresOn,
-      );
-
-    return new TaskUpdate({
-      ...mockCreateTask(overrides),
-      updatedAt: new Date('Tue Jan 14 2025 11:38:38'),
-    });
-  };
 
   describe('POST /', () => {
     beforeEach(() => {

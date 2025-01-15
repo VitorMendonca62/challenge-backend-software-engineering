@@ -8,11 +8,7 @@ import { DeleteTaskUseCase } from './core/application/use-cases/delete-task.usec
 import { TaskRepository } from './core/application/ports/secondary/task-repository.interface';
 import { TaskMapper } from './adaptars/mappers/task.mapper';
 import { DatabaseModule } from '@modules/database/database.module';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { MongooseTaskRepository } from './adaptars/secondary/database/repositories/mongoose-taks-repository';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { InMemoryTaskRepository } from './adaptars/secondary/database/repositories/in-memory-task-repository';
-import { getRepositoryForEnvironment } from './adaptars/secondary/database/utils/repository.util';
+import { getRepositoryForEnvironment } from './adaptars/utils/repository.util';
 
 @Module({
   imports: [DatabaseModule],
