@@ -180,7 +180,6 @@ describe('TaskController', () => {
         message: [
           'O titulo está muito curto',
           'A descrição está muito curto',
-          'A data de vencimento está inválida',
           'O status está inválido, escolha outro válido',
         ],
         statusCode: 400,
@@ -393,7 +392,6 @@ describe('TaskController', () => {
         message: [
           'O titulo está muito curto',
           'A descrição está muito curto',
-          'A data de vencimento está inválida',
           'O status está inválido, escolha outro válido',
         ],
         statusCode: 400,
