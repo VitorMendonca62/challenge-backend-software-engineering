@@ -22,20 +22,23 @@ export class MongooseTaskRepository implements TaskRepository {
   findById(id: string): Promise<Task> {
     return this.taskModel.findById(id).exec();
   }
+
   findAll(): Promise<Task[]> {
     return this.taskModel.find().exec();
   }
+
   findByStatus(status: TaskStatus): Promise<Task[]> {
     return this.taskModel.find({ status }).exec();
   }
 
-  async update(id: string, newTask: TaskUpdate): Promise<Task> {
+  update(id: string, newTask: TaskUpdate): Promise<Task> {
     return this.taskModel
       .findOneAndUpdate({ _id: id }, newTask, {
         new: true,
       })
       .exec();
   }
+
   async delete(id: string): Promise<void> {
     this.taskModel.findOneAndDelete({ _id: id }, { new: true }).exec();
   }

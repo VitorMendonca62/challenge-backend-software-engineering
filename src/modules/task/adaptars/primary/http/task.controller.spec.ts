@@ -169,22 +169,7 @@ describe('TaskController', () => {
       });
     });
 
-    it('should throw a bad request error with invalid status ', async () => {
-      const createTaskDTO = { title: 'Task 04', status: 'invalid-status' };
-
-      const response = await request(app.getHttpServer())
-        .post('/task')
-        .send(createTaskDTO);
-
-      expect(response.statusCode).toBe(400);
-      expect(response.body).toEqual({
-        error: 'Bad Request',
-        message: ['O status está inválido, escolha outro válido'],
-        statusCode: 400,
-      });
-    });
-
-    it('should bad request when expiresOn is latest than current date', async () => {
+    it('should throw bad request when expiresOn is newer than current date', async () => {
       const createTaskDTO = mockCreateTask({
         expiresOn: '2000-12-21T18:30:00.000Z',
       });
@@ -196,6 +181,30 @@ describe('TaskController', () => {
       expect(response.body).toEqual({
         error: 'Bad Request',
         message: 'A data de vencimento deve ser maior que a data atual',
+        statusCode: 400,
+      });
+    });
+
+    it('should throw bad request when invalid fields', async () => {
+      const createTaskDTO = mockCreateTask({
+        title: 'T',
+        description: 'T',
+        status: 'invalid-status',
+        expiresOn: 'invalid-date',
+      });
+
+      const response = await request(app.getHttpServer())
+        .post('/task')
+        .send(createTaskDTO);
+
+      expect(response.body).toEqual({
+        error: 'Bad Request',
+        message: [
+          'O titulo está muito curto',
+          'A descrição está muito curto',
+          'A data de vencimento está inválida',
+          'O status está inválido, escolha outro válido',
+        ],
         statusCode: 400,
       });
     });
@@ -385,6 +394,30 @@ describe('TaskController', () => {
       expect(response.body).toEqual({
         error: 'Bad Request',
         message: 'A data de vencimento deve ser maior que a data atual',
+        statusCode: 400,
+      });
+    });
+
+    it('should throw bad request when invalid fields', async () => {
+      const updateTaskDTO = {
+        title: 'T',
+        description: 'T',
+        status: 'invalid-status',
+        expiresOn: 'invalid-date',
+      };
+
+      const response = await request(app.getHttpServer())
+        .patch('/task/TASKID')
+        .send(updateTaskDTO);
+
+      expect(response.body).toEqual({
+        error: 'Bad Request',
+        message: [
+          'O titulo está muito curto',
+          'A descrição está muito curto',
+          'A data de vencimento está inválida',
+          'O status está inválido, escolha outro válido',
+        ],
         statusCode: 400,
       });
     });
