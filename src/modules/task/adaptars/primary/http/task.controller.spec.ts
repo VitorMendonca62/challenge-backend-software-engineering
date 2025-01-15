@@ -422,4 +422,24 @@ describe('TaskController', () => {
       });
     });
   });
+
+  describe('DELETE /:id', () => {
+    beforeEach(() => {
+      jest
+        .spyOn(deleteTaskUseCase, 'execute')
+        .mockImplementation(() => undefined);
+
+      jest
+        .spyOn(taskMapper, 'update')
+        .mockImplementation(async (dto) => mockUpdateTask(dto));
+    });
+    it('should delete task', async () => {
+      const response = await taskController.remove('TASKID');
+
+      expect(response).toEqual({
+        data: undefined,
+        message: 'Tarefa deletada com sucesso!',
+      });
+    });
+  });
 });
