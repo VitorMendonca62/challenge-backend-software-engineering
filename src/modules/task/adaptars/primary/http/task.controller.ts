@@ -35,11 +35,12 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { TaskUpdate } from '@modules/task/core/domain/task-update.entity';
-import { ValidationStatusPipe } from './pipes/validate-status.pipe';
+import { ValidationStatusPipe } from './pipes/validation-status.pipe';
+import { ValidationExpiresOnPipe } from './pipes/validation-expireson.pipe';
 
-abstract class ResponseController {
-  abstract message: string;
-  abstract data: Task | undefined;
+interface ResponseController {
+  message: string;
+  data: Task | Task[] | undefined;
 }
 
 @ApiTags('task')
@@ -56,6 +57,7 @@ export class TaskController {
   ) {}
 
   @PostTaskSwagger()
+  @UsePipes(new ValidationExpiresOnPipe())
   @Post()
   async create(
     @Body() createTaskDTO: CreateTaskDTO,
@@ -78,7 +80,9 @@ export class TaskController {
   @GetTasksSwagger()
   @Get()
   @UsePipes(new ValidationStatusPipe())
-  async findAll(@Query('status') status?: TaskStatus) {
+  async findAll(
+    @Query('status') status?: TaskStatus,
+  ): Promise<ResponseController> {
     if (status) {
       return {
         data: await this.getTasksUseCase.findByStatus(status),
@@ -95,7 +99,7 @@ export class TaskController {
 
   @GetTaskSwagger()
   @Get(':id')
-  async findOne(@Param('id') id: string) {
+  async findOne(@Param('id') id: string): Promise<ResponseController> {
     return {
       data: await this.getTaskUseCase.findById(id),
       message: 'Aqui está a tarefa filtrada pelo ID',
@@ -104,10 +108,14 @@ export class TaskController {
 
   @UpdateTaskSwagger()
   @Patch(':id')
-  async update(@Param('id') id: string, @Body() updateTaskDTO: UpdateTaskDTO) {
+  @UsePipes(new ValidationExpiresOnPipe())
+  async update(
+    @Param('id') id: string,
+    @Body() updateTaskDTO: UpdateTaskDTO,
+  ): Promise<ResponseController> {
     const { title, description, expiresOn, status } = updateTaskDTO;
 
-    const newTask = await this.taskMapper.update(id, {
+    const newTask = await this.taskMapper.update({
       title,
       description,
       expiresOn,
@@ -121,13 +129,17 @@ export class TaskController {
     }
 
     return {
-      data: this.updateTaskUseCase.execute(id, newTask),
+      data: await this.updateTaskUseCase.execute(id, newTask),
       message: 'Tarefa atualizada com sucesso!',
     };
   }
+
   @DeleteTaskSwagger()
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.deleteTaskUseCase.execute(id);
+  async remove(@Param('id') id: string): Promise<ResponseController> {
+    return {
+      message: 'Tarefa deletada com sucesso!',
+      data: await this.deleteTaskUseCase.execute(id),
+    };
   }
 }

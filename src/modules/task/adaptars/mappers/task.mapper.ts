@@ -32,7 +32,7 @@ export class TaskMapper {
     return task;
   }
 
-  async update(id: string, updateTaskDTO: UpdateTaskDTO): Promise<TaskUpdate> {
+  async update(updateTaskDTO: UpdateTaskDTO): Promise<TaskUpdate> {
     const updatedAt = new Date();
     const expiresOn = new Date(updateTaskDTO.expiresOn);
 
