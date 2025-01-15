@@ -33,6 +33,7 @@ import {
   ValidationPipe,
   Query,
   BadRequestException,
+  HttpCode,
 } from '@nestjs/common';
 import { TaskUpdate } from '@modules/task/core/domain/task-update.entity';
 import { ValidationStatusPipe } from './pipes/validation-status.pipe';
@@ -59,6 +60,7 @@ export class TaskController {
   @PostTaskSwagger()
   @UsePipes(new ValidationExpiresOnPipe())
   @Post()
+  @HttpCode(201)
   async create(
     @Body() createTaskDTO: CreateTaskDTO,
   ): Promise<ResponseController> {
@@ -80,6 +82,7 @@ export class TaskController {
   @GetTasksSwagger()
   @Get()
   @UsePipes(new ValidationStatusPipe())
+  @HttpCode(200)
   async findAll(
     @Query('status') status?: TaskStatus,
   ): Promise<ResponseController> {
@@ -99,6 +102,7 @@ export class TaskController {
 
   @GetTaskSwagger()
   @Get(':id')
+  @HttpCode(200)
   async findOne(@Param('id') id: string): Promise<ResponseController> {
     return {
       data: await this.getTaskUseCase.findById(id),
@@ -109,6 +113,7 @@ export class TaskController {
   @UpdateTaskSwagger()
   @Patch(':id')
   @UsePipes(new ValidationExpiresOnPipe())
+  @HttpCode(200)
   async update(
     @Param('id') id: string,
     @Body() updateTaskDTO: UpdateTaskDTO,
@@ -136,6 +141,7 @@ export class TaskController {
 
   @DeleteTaskSwagger()
   @Delete(':id')
+  @HttpCode(204)
   async remove(@Param('id') id: string): Promise<ResponseController> {
     return {
       message: 'Tarefa deletada com sucesso!',
