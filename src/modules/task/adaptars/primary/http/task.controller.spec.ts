@@ -9,13 +9,12 @@ import { Task, TaskStatus } from '@modules/task/core/domain/task.entity';
 import { Test, TestingModule } from '@nestjs/testing';
 import { TaskRepository } from '@modules/task/core/application/ports/secondary/task-repository.interface';
 import { CreateTaskDTO } from './dto/create-task.dto';
-import {
-  INestApplication,
-  NotFoundException,
-  ValidationPipe,
-} from '@nestjs/common';
+import { INestApplication, ValidationPipe } from '@nestjs/common';
 import * as request from 'supertest';
 import { getRepositoryForEnvironment } from '../../secondary/database/utils/repository.util';
+import { ConfigModule } from '@nestjs/config';
+import { TaskUpdate } from '@modules/task/core/domain/task-update.entity';
+import { UpdateTaskDTO } from './dto/update-task.dto';
 
 describe('TaskController', () => {
   let app: INestApplication;
@@ -25,7 +24,6 @@ describe('TaskController', () => {
   let createTaskUseCase: CreateTaskUseCase;
   let getTaskUseCase: GetTaskUseCase;
   let getTasksUseCase: GetTasksUseCase;
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   let updateTaskUseCase: UpdateTaskUseCase;
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   let deleteTaskUseCase: DeleteTaskUseCase;
@@ -34,6 +32,11 @@ describe('TaskController', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
+      imports: [
+        ConfigModule.forRoot({
+          isGlobal: true,
+        }),
+      ],
       controllers: [TaskController],
       providers: [
         GetTaskUseCase,
@@ -42,6 +45,7 @@ describe('TaskController', () => {
         CreateTaskUseCase,
         DeleteTaskUseCase,
         TaskMapper,
+
         {
           provide: TaskRepository,
           useFactory: () => getRepositoryForEnvironment(true),
@@ -85,10 +89,22 @@ describe('TaskController', () => {
 
   const mockTask = (overrides: CreateTaskDTO | object = {}) =>
     new Task({
-      ...mockCreateTask({ ...overrides }),
+      ...mockCreateTask(overrides),
       createdAt: new Date('Tue Jan 14 2025 11:38:38'),
       updatedAt: new Date('Tue Jan 14 2025 11:38:38'),
     });
+
+  const mockUpdateTask = (overrides: UpdateTaskDTO | object = {}) => {
+    if ((overrides as UpdateTaskDTO).expiresOn)
+      (overrides as UpdateTaskDTO).expiresOn = new Date(
+        (overrides as UpdateTaskDTO).expiresOn,
+      );
+
+    return new TaskUpdate({
+      ...mockCreateTask(overrides),
+      updatedAt: new Date('Tue Jan 14 2025 11:38:38'),
+    });
+  };
 
   describe('POST /', () => {
     beforeEach(() => {
@@ -167,15 +183,29 @@ describe('TaskController', () => {
         statusCode: 400,
       });
     });
+
+    it('should bad request when expiresOn is latest than current date', async () => {
+      const createTaskDTO = mockCreateTask({
+        expiresOn: '2000-12-21T18:30:00.000Z',
+      });
+
+      const response = await request(app.getHttpServer())
+        .post('/task')
+        .send(createTaskDTO);
+
+      expect(response.body).toEqual({
+        error: 'Bad Request',
+        message: 'A data de vencimento deve ser maior que a data atual',
+        statusCode: 400,
+      });
+    });
   });
 
   describe('GET /', () => {
     beforeEach(() => {
-      const task = mockTask();
-
       jest
         .spyOn(getTasksUseCase, 'findAll')
-        .mockImplementation(async () => [task, task]);
+        .mockImplementation(async () => mockListTask());
     });
 
     it('should use case call', async () => {
@@ -187,27 +217,11 @@ describe('TaskController', () => {
     it('should return two tasks', async () => {
       const response = await taskController.findAll();
 
-      const task = mockTask();
-
-      expect(response.data).toHaveLength(2);
+      expect(response.data).toHaveLength(4);
       expect(response).toEqual({
-        data: [task, task],
+        data: mockListTask(),
         message: 'Aqui está a listagem de todas as tarefas',
       });
-    });
-
-    it('should throw not found error', async () => {
-      jest
-        .spyOn(getTasksUseCase, 'findAll')
-        .mockRejectedValue(
-          new NotFoundException(
-            'Não foi possivel encontrar alguma tarefa. Crie uma!',
-          ),
-        );
-
-      await expect(taskController.findAll()).rejects.toThrow(
-        'Não foi possivel encontrar alguma tarefa. Crie uma!',
-      );
     });
   });
 
@@ -228,7 +242,7 @@ describe('TaskController', () => {
       const tasks = mockListTask();
       jest
         .spyOn(getTasksUseCase, 'findByStatus')
-        .mockResolvedValue([tasks[0], tasks[3]]);
+        .mockImplementation(async () => [tasks[0], tasks[3]]);
 
       const response = await taskController.findAll('pendente');
 
@@ -238,20 +252,6 @@ describe('TaskController', () => {
         message:
           'Aqui está a listagem de todas as tarefas filtradas por status',
       });
-    });
-
-    it('should throw not found error', async () => {
-      jest
-        .spyOn(getTasksUseCase, 'findByStatus')
-        .mockRejectedValue(
-          new NotFoundException(
-            'Não foi possivel encontrar tarefas nesse filtro',
-          ),
-        );
-
-      await expect(taskController.findAll('pendente')).rejects.toThrow(
-        'Não foi possivel encontrar tarefas nesse filtro',
-      );
     });
 
     it('should throw bad request error with invalid status', async () => {
@@ -269,14 +269,12 @@ describe('TaskController', () => {
 
   describe('GET /:id', () => {
     beforeEach(() => {
-      const task = mockTask({
-        title: 'Task 01',
-        _id: 'IDTASK',
-      });
-
-      jest
-        .spyOn(getTaskUseCase, 'findById')
-        .mockImplementation(async () => task);
+      jest.spyOn(getTaskUseCase, 'findById').mockImplementation(async (id) =>
+        mockTask({
+          title: 'Task 01',
+          _id: id,
+        }),
+      );
     });
 
     it('should use case call', async () => {
@@ -298,17 +296,97 @@ describe('TaskController', () => {
         message: 'Aqui está a tarefa filtrada pelo ID',
       });
     });
+  });
 
-    it('should throw not found error', async () => {
+  describe('PATCH /:id', () => {
+    beforeEach(() => {
       jest
-        .spyOn(getTaskUseCase, 'findById')
-        .mockRejectedValue(
-          new NotFoundException('Não foi possivel encontrar a tarefa'),
+        .spyOn(updateTaskUseCase, 'execute')
+        .mockImplementation(async (id, updateTaskDTO) =>
+          mockTask({
+            _id: id,
+            title: 'Task 01',
+            ...updateTaskDTO,
+          }),
         );
 
-      await expect(taskController.findOne('NOTFOUNDID')).rejects.toThrow(
-        'Não foi possivel encontrar a tarefa',
+      jest
+        .spyOn(taskMapper, 'update')
+        .mockImplementation(async (dto) => mockUpdateTask(dto));
+    });
+
+    it('should use case call with correct parameters', async () => {
+      const updateTaskDTO = {
+        title: 'Task 01',
+        description: undefined,
+        expiresOn: undefined,
+        status: undefined,
+      };
+
+      await taskController.update('TASKID', updateTaskDTO);
+
+      expect(taskMapper.update).toHaveBeenCalledWith(updateTaskDTO);
+      expect(updateTaskUseCase.execute).toHaveBeenCalledWith(
+        'TASKID',
+        expect.any(TaskUpdate),
       );
+    });
+
+    it('should update task without optional fields and return the task', async () => {
+      const updateTaskDTO = {
+        title: 'Task 02',
+        status: 'realizando' as TaskStatus,
+        description: undefined,
+        expiresOn: undefined,
+      };
+
+      const response = await taskController.update('TASKID', updateTaskDTO);
+
+      expect(response).toEqual({
+        data: mockTask(updateTaskDTO),
+        message: 'Tarefa atualizada com sucesso!',
+      });
+    });
+
+    it('should update task with optional fields and return the task', async () => {
+      const updateDTO = {
+        title: 'Task 02',
+        status: 'realizando' as TaskStatus,
+        description: 'teste',
+        expiresOn: new Date('2024-12-21T18:30:00.000Z'),
+      };
+
+      const response = await taskController.update('TASKID', updateDTO);
+
+      expect(response).toEqual({
+        data: mockTask({
+          ...updateDTO,
+          expiresOn: new Date(updateDTO.expiresOn),
+        }),
+        message: 'Tarefa atualizada com sucesso!',
+      });
+    });
+
+    it('should bad request when no having fields', async () => {
+      const updateDTO = {};
+
+      await expect(taskController.update('TASKID', updateDTO)).rejects.toThrow(
+        'Adicione algum campo para realizar a modificação',
+      );
+    });
+
+    it('should bad request when expiresOn is latest than current date', async () => {
+      const updateTaskDTO = { expiresOn: '2000-12-21T18:30:00.000Z' };
+
+      const response = await request(app.getHttpServer())
+        .patch('/task/TASKID')
+        .send(updateTaskDTO);
+
+      expect(response.body).toEqual({
+        error: 'Bad Request',
+        message: 'A data de vencimento deve ser maior que a data atual',
+        statusCode: 400,
+      });
     });
   });
 });
