@@ -5,11 +5,12 @@ export function getRepositoryForEnvironment(isTest?: boolean) {
   const repositoryType =
     process.env[!isTest ? 'REPOSITORY' : 'REPOSITORY_TEST'];
 
-  if (repositoryType === 'MONGOOSE') {
-    return new MongooseTaskRepository();
-  } else if (repositoryType === 'INMEMORY') {
-    return new InMemoryTaskRepository();
-  } else {
-    throw new Error('Invalid STORAGE_TYPE');
+  switch (repositoryType) {
+    case 'MONGOOSE':
+      return new MongooseTaskRepository();
+    case 'INMEMORY':
+      return new InMemoryTaskRepository();
+    default:
+      throw new Error('Invalid STORAGE_TYPE');
   }
 }

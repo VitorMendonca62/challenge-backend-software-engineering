@@ -25,7 +25,6 @@ describe('TaskController', () => {
   let getTaskUseCase: GetTaskUseCase;
   let getTasksUseCase: GetTasksUseCase;
   let updateTaskUseCase: UpdateTaskUseCase;
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   let deleteTaskUseCase: DeleteTaskUseCase;
 
   let taskMapper: TaskMapper;
