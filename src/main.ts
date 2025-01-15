@@ -7,7 +7,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   const config = new DocumentBuilder()
-    .setTitle('Challenge backend software engineering')
+    .setTitle('Task Management REST API With Nest.js')
     .setVersion('1.0')
     .build();
 
