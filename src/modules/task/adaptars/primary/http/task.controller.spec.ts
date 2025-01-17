@@ -404,11 +404,8 @@ describe('TaskController', () => {
       jest
         .spyOn(deleteTaskUseCase, 'execute')
         .mockImplementation(() => undefined);
-
-      jest
-        .spyOn(taskMapper, 'update')
-        .mockImplementation(async (dto) => mockUpdateTask(dto));
     });
+    
     it('should delete task', async () => {
       const response = await taskController.remove('TASKID');
 
